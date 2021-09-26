@@ -16,13 +16,13 @@ def sigmoid(a):
     #  function must also work for vector inputs: for example if the input
     #  is [1 -1 2] the output should be a vector of the same size with the
     #  sigmoid values for every element of the input vector.
-    #-------------------------------------------------------------------#
+    #-------------------------------------------------------------------#§
 
     return s
 
 
 def lr_nll(X, Y, Theta):
-    # Computes the negative log-likelihood (NLL) loss for the logistic
+    # Computes the negative log-likelihood (NLL) loss for the logistic§
     # regression classifier.
     # Input:
     # X - the data matrix

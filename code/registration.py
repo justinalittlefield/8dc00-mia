@@ -7,7 +7,8 @@ from scipy import ndimage
 import registration_util as util
 import math
 from sympy import *
-
+import registration_util as util
+from IPython.display import display, clear_output
 
 # SECTION 1. Geometrical transformations
 
@@ -100,7 +101,6 @@ def image_transform(I, Th, output_shape=None):
     # convert to double and remember the original input type
 
     input_type = type(I)
-
     # default output size is same as input
     if output_shape is None:
         output_shape = I.shape
@@ -237,7 +237,7 @@ def joint_histogram(I, J, num_bins=16, minmax_range=None):
     # step to make p take the form of a probability mass function
     # (p.m.f.).
     # ------------------------------------------------------------------#
-
+    p = p/sum(sum(p))
     return p
 
 
@@ -268,7 +268,14 @@ def mutual_information(p):
     # HINT: p_I is a column-vector and p_J is a row-vector so their
     # product is a matrix. You can also use the sum() function here.
     # ------------------------------------------------------------------#
-
+    test = p_I.dot(p_J)
+    MI = []
+    for i in range(p.shape[0]):
+        MI.append([])
+        for j in range (p.shape[1]):
+            MI[i].append(p[i][j]*np.log(p[i][j]/test[i][j]))
+    MI = np.array(MI)
+    MI = sum(sum(MI))
     return MI
 
 
@@ -297,8 +304,15 @@ def mutual_information_e(p):
     # TODO: Implement the computation of the mutual information via
     # computation of entropy.
     # ------------------------------------------------------------------#
+    # calculate shannon entropy in nats
+    joint_entropy = -np.sum([[j*np.log(j) for j in i] for i in p])
+    # individual entropies in nats
+    H_I = -np.sum([[j*np.log(j) for j in i] for i in p_I])
+    H_J = -np.sum([[j*np.log(j) for j in i] for i in p_J])
 
+    MI = H_I + H_J - joint_entropy
     return MI
+
 
 
 # SECTION 4. Towards intensity-based image registration
