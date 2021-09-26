@@ -74,10 +74,15 @@ def t2h_test():
 
 
 def arbitrary_rotation():
-
     X = util.test_object(1)
     Xh = util.c2h(X)
-
+    #needs to be translate according to vector (so use t2h)
+    #then rotate so use reg.rotate()
+    #then translate backwards so use the inverse of the previous transformation
+    Tt = util.t2h(reg.identity(),X[:,0])
+    Tr = util.t2h(reg.rotate(np.pi/4),np.array([0,0]))
+    Tt_inv = np.linalg.inv(Tt)
+    T =  Tt.dot(Tr.dot(Tt_inv))
     #------------------------------------------------------------------#
     # TODO: Perform rotation of the test shape around the first vertex
     #------------------------------------------------------------------#
@@ -135,10 +140,9 @@ def image_transform_test():
     
 
 def ls_solve_test():
-
-    #------------------------------------------------------------------#
-    # TODO: Test your implementation of the ls_solve definition
-    #------------------------------------------------------------------#
+    A = np.array([[3, 4], [5, 6], [7, 8], [17, 10]])
+    b = np.array([1,2,3,4])
+    return reg.ls_solve(A,b)
 
 
 def ls_affine_test():
@@ -195,7 +199,9 @@ def correlation_test():
     #------------------------------------------------------------------#
     # TODO: Implement a few more tests of the correlation definition
     #------------------------------------------------------------------#
-
+    C2 = reg.correlation(I, J)
+    # correlation of translated image should be lower than 1
+    assert C2<1,"correlation is incorrectly implemented"
     print('Test successful!')
 
 
