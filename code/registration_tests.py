@@ -260,7 +260,13 @@ def ngradient_test():
     exponential = lambda x: np.exp(x)
     g1 = reg.ngradient(exponential, np.ones((1,)))
     assert abs(g1 - exponential(1)) < 1e-5, "Numerical gradient is incorrectly implemented (exponential test)"
-
+    parabola = lambda x: x**2
+    g2 = reg.ngradient(parabola, np.ones((1,)))
+    assert abs(g2- 2) < 1e-5,"Numberical gradient is incorrect (parabola test)"
+    simple_multi_parameter = lambda x: x[0]*x[1]
+    g3 = reg.ngradient(simple_multi_parameter, np.array([1,2]))
+    assert abs(g3[0] - 2) < 1e-5, "numberical gradient incorrect (multi parameter x)"
+    assert abs(g3[1] - 1) < 1e-5, "numerical gradient incorrect (multi parameter y)"
     # ------------------------------------------------------------------#
     # TODO: Implement a few more test cases of ngradient
     # ------------------------------------------------------------------#

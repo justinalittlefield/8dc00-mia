@@ -10,6 +10,7 @@ from sympy import *
 import registration_util as util
 from IPython.display import display, clear_output
 
+
 # SECTION 1. Geometrical transformations
 
 
@@ -237,7 +238,7 @@ def joint_histogram(I, J, num_bins=16, minmax_range=None):
     # step to make p take the form of a probability mass function
     # (p.m.f.).
     # ------------------------------------------------------------------#
-    p = p/sum(sum(p))
+    p = p / sum(sum(p))
     return p
 
 
@@ -272,8 +273,8 @@ def mutual_information(p):
     MI = []
     for i in range(p.shape[0]):
         MI.append([])
-        for j in range (p.shape[1]):
-            MI[i].append(p[i][j]*np.log(p[i][j]/test[i][j]))
+        for j in range(p.shape[1]):
+            MI[i].append(p[i][j] * np.log(p[i][j] / test[i][j]))
     MI = np.array(MI)
     MI = sum(sum(MI))
     return MI
@@ -305,14 +306,13 @@ def mutual_information_e(p):
     # computation of entropy.
     # ------------------------------------------------------------------#
     # calculate shannon entropy in nats
-    joint_entropy = -np.sum([[j*np.log(j) for j in i] for i in p])
+    joint_entropy = -np.sum([[j * np.log(j) for j in i] for i in p])
     # individual entropies in nats
-    H_I = -np.sum([[j*np.log(j) for j in i] for i in p_I])
-    H_J = -np.sum([[j*np.log(j) for j in i] for i in p_J])
+    H_I = -np.sum([[j * np.log(j) for j in i] for i in p_I])
+    H_J = -np.sum([[j * np.log(j) for j in i] for i in p_J])
 
     MI = H_I + H_J - joint_entropy
     return MI
-
 
 
 # SECTION 4. Towards intensity-based image registration
@@ -327,13 +327,17 @@ def ngradient(fun, x, h=1e-3):
     # Output:
     # g - vector of partial derivatives (gradient) of fun
 
-    g = np.zeros_like(x)
+    g = np.zeros_like(x).astype(float)
 
     # ------------------------------------------------------------------#
     # TODO: Implement the  computation of the partial derivatives of
     # the function at x with numerical differentiation.
     # g[k] should store the partial derivative w.r.t. the k-th parameter
     # ------------------------------------------------------------------#
+
+    for index, k in enumerate(x):
+        g[index] = (fun(np.array([x[index] + h / 2, *np.delete(x, index)])) - fun(
+            np.array([x[index] - h / 2, *np.delete(x, index)]))) / h
 
     return g
 
@@ -389,7 +393,7 @@ def affine_corr(I, Im, x, return_transform=True):
     # I - fixed image
     # Im - moving image
     # x - parameters of the rigid transform: the first element
-    #     is the roation angle, the second and third are the
+    #     is the rotation angle, the second and third are the
     #     scaling parameters, the fourth and fifth are the
     #     shearing parameters and the remaining two elements
     #     are the translation
@@ -405,6 +409,23 @@ def affine_corr(I, Im, x, return_transform=True):
     # ------------------------------------------------------------------#
     # TODO: Implement the missing functionality
     # ------------------------------------------------------------------#
+    # first element is rotation angle
+    Tr = rotate(x[0])
+    # second and third elements are the scaling parameters
+    Tsc = scale(x[1], x[2])
+    # fourth and fifth are shearing parameters
+    Tsh = shear(x[3], x[4])
+    # combined
+    Tc = Tr.dot(Tsc).dot(Tsh)
+    # sixth and seventh are translation
+    Th = util.t2h(Tc, x[5:] * SCALING)
+
+    # transform the moving image
+    Im_t, Xt = image_transform(Im, Th)
+
+    # compute the similarity between the fixed and transformed
+    # moving image
+    C = correlation(I, Im_t)
 
     if return_transform:
         return C, Im_t, Th
@@ -425,7 +446,7 @@ def affine_mi(I, Im, x, return_transform=True):
     #     are the translation
     # return_transform: Flag for controlling the return values
     # Output:
-    # C - normalized cross-correlation between I and T(Im)
+    # MI - Mutual information between I and T(Im)
     # Im_t - transformed moving image T(Im)
     # Th - transformation matrix (only returned if return_transform=True)
 
@@ -436,7 +457,26 @@ def affine_mi(I, Im, x, return_transform=True):
     # TODO: Implement the missing functionality
     # ------------------------------------------------------------------#
 
+    # first element is rotation angle
+    Tr = rotate(x[0])
+    # second and third elements are the scaling parameters
+    Tsc = scale(x[1], x[2])
+    # fourth and fifth are shearing parameters
+    Tsh = shear(x[3], x[4])
+    # combined
+    Tc = Tr.dot(Tsc).dot(Tsh)
+    # sixth and seventh are translation
+    Th = util.t2h(Tc, x[5:] * SCALING)
+
+    # transform the moving image
+    Im_t, Xt = image_transform(Im, Th)
+
+    # compute the joint histogram
+    p = joint_histogram(I, Im_t)
+    # use joint histogram to compute mutual information
+    MI = mutual_information(p)
+
     if return_transform:
-        return C, Im_t, Th
+        return MI, Im_t, Th
     else:
-        return C
+        return MI
