@@ -8,6 +8,7 @@ import registration_util as util
 import math
 from sympy import *
 import registration_util as util
+from numba import jit
 from IPython.display import display, clear_output
 
 
@@ -115,7 +116,6 @@ def image_transform(I, Th, output_shape=None):
     X = np.concatenate((xx.reshape((1, xx.size)), yy.reshape((1, yy.size))))
     # convert to homogeneous coordinates
     Xh = util.c2h(X)
-
     Th_inv = np.linalg.inv(Th)
     Xt = Th_inv.dot(Xh)
 
@@ -279,7 +279,6 @@ def mutual_information(p):
     MI = sum(sum(MI))
     return MI
 
-
 def mutual_information_e(p):
     # Compute the mutual information from a joint histogram.
     # Alternative implementation via computation of entropy.
@@ -318,7 +317,7 @@ def mutual_information_e(p):
 # SECTION 4. Towards intensity-based image registration
 
 
-def ngradient(fun, x, h=1e-3):
+def ngradient(fun, x, h=1e-5):
     # Computes the derivative of a function with numerical differentiation.
     # Input:
     # fun - function for which the gradient is computed
@@ -336,8 +335,12 @@ def ngradient(fun, x, h=1e-3):
     # ------------------------------------------------------------------#
 
     for index, k in enumerate(x):
-        g[index] = (fun(np.array([x[index] + h / 2, *np.delete(x, index)])) - fun(
-            np.array([x[index] - h / 2, *np.delete(x, index)]))) / h
+        x = x.astype(float)
+        xtp = x.copy()
+        xtm = x.copy()
+        xtp[index] = xtp[index] + h/2
+        xtm[index] = xtm[index] - h/2
+        g[index] = (fun(xtp) - fun(xtm))/h
 
     return g
 
@@ -474,7 +477,7 @@ def affine_mi(I, Im, x, return_transform=True):
     # compute the joint histogram
     p = joint_histogram(I, Im_t)
     # use joint histogram to compute mutual information
-    MI = mutual_information(p)
+    MI = mutual_information_e(p)
 
     if return_transform:
         return MI, Im_t, Th
