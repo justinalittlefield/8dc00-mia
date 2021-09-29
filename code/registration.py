@@ -8,7 +8,6 @@ import registration_util as util
 import math
 from sympy import *
 import registration_util as util
-from numba import jit
 from IPython.display import display, clear_output
 
 
@@ -477,7 +476,7 @@ def affine_mi(I, Im, x, return_transform=True):
     # compute the joint histogram
     p = joint_histogram(I, Im_t)
     # use joint histogram to compute mutual information
-    MI = mutual_information_e(p)
+    MI = mutual_information(p)
 
     if return_transform:
         return MI, Im_t, Th
