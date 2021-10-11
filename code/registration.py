@@ -137,10 +137,11 @@ def ls_solve(A, b):
 
     AtA = np.transpose(A).dot(A)
     Atb = np.transpose(A).dot(b)
-    augmented = np.concatenate([AtA, np.transpose([Atb])], axis=1)
-    reduced = Matrix(augmented).rref()[0]
-    w = np.array([reduced[i, -1] for i in range(reduced.shape[0])])
-    w = w.astype(float)
+    w = np.linalg.inv(AtA).dot(Atb)
+    #augmented = np.concatenate([AtA, np.transpose([Atb])], axis=1)
+    #reduced = Matrix(augmented).rref()[0]
+    #w = np.array([reduced[i, -1] for i in range(reduced.shape[0])])
+    #w = w.astype(float)
     # compute the error
     E = np.transpose(A.dot(w) - b).dot(A.dot(w) - b)
 

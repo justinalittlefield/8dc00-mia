@@ -51,7 +51,7 @@ def linear_regression():
     trainX = train_data[:,0].reshape(-1,1)
     trainXones = util.addones(trainX)
     trainY = train_data[:,1].reshape(-1,1)
-    
+    Theta = reg.ls_solve(trainXones, trainY)[0]
     #---------------------------------------------------------------------#
 
     fig1 = plt.figure(figsize=(10,10))
@@ -78,7 +78,10 @@ def linear_regression():
     #---------------------------------------------------------------------#
     # TODO: Compute the error for the trained model.
     #---------------------------------------------------------------------#
-
+    valX = validation_data[:,0].reshape(-1,1)
+    valY = validation_data[:,1].reshape(-1,1)
+    E_validation = sum(abs((valX.dot(np.transpose(Theta))) - valY))
+    E_test = sum(abs((testX.dot(np.transpose(Theta))) - testY))
     return E_validation, E_test
 
 
@@ -415,6 +418,7 @@ def covariance_matrix_test():
     #------------------------------------------------------------------#
 
 def eigen_vecval_test(sigma):
+    pass
     #------------------------------------------------------------------#
     # TODO: Compute the eigenvectors and eigenvalues of the covariance matrix,
     #  what two properties can you name about the eigenvectors? How can you verify these properties?
@@ -422,6 +426,7 @@ def eigen_vecval_test(sigma):
     #------------------------------------------------------------------#
 
 def rotate_using_eigenvectors_test(X, Y, v):
+    pass
     #------------------------------------------------------------------#
     # TODO: Rotate X using the eigenvectors
     #------------------------------------------------------------------#
