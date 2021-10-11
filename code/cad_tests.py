@@ -80,17 +80,76 @@ def linear_regression():
     #---------------------------------------------------------------------#
     valX = validation_data[:,0].reshape(-1,1)
     valY = validation_data[:,1].reshape(-1,1)
-    E_validation = sum(abs((valX.dot(np.transpose(Theta))) - valY))
-    E_test = sum(abs((testX.dot(np.transpose(Theta))) - testY))
+    valXones = util.addones(valX)
+    testXones = util.addones(testX)
+    E_validation = np.linalg.norm(valXones.dot(Theta) - valY)**2
+    E_test = np.linalg.norm(testXones.dot(Theta) - testY)**2
     return E_validation, E_test
 
 
 def quadratic_regression():
-    #---------------------------------------------------------------------#
-    # TODO: Implement training of a quadratic regression model.
-    #---------------------------------------------------------------------#
+    # load the training, validation and testing datasets
+    fn1 = '../data/linreg_ex_test.txt'
+    fn2 = '../data/linreg_ex_train.txt'
+    fn3 = '../data/linreg_ex_validation.txt'
+    # shape (30,2) numpy array; x = column 0, y = column 1
+    test_data = np.loadtxt(fn1)
+    # shape (20,2) numpy array; x = column 0, y = column 1
+    train_data = np.loadtxt(fn2)
+    # shape (10,2) numpy array; x = column 0, y = column 1
+    validation_data = np.loadtxt(fn3)
 
+    # plot the training dataset
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+    ax.plot(train_data[:, 0], train_data[:, 1], '*')
+    ax.grid()
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Training data')
+
+    trainX = train_data[:, 0].reshape(-1,1)
+    trainX_square = np.append(trainX, trainX**2, axis=1)
+    trainXones = util.addones(trainX)
+    trainXones_square = util.addones(trainX_square)
+    trainY = train_data[:, 1].reshape(-1, 1)
+    Theta = reg.ls_solve(trainXones_square, trainY)[0]
+
+    fig1 = plt.figure(figsize=(10, 10))
+    ax1 = fig1.add_subplot(111)
+    util.plot_regression(trainX_square, trainY, Theta, ax1)
+    ax1.grid()
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
+    ax1.legend(('Original data', 'Regression curve', 'Predicted Data', 'Error'))
+    ax1.set_title('Training set')
+
+    testX = test_data[:, 0].reshape(-1, 1)
+    testX_square = np.append(testX, testX ** 2, axis=1)
+    testY = test_data[:, 1].reshape(-1, 1)
+    testY_square = np.append(testY, testY ** 2, axis=1)
+
+    fig2 = plt.figure(figsize=(10, 10))
+    ax2 = fig2.add_subplot(111)
+    util.plot_regression(testX_square, testY, Theta, ax2)
+    ax2.grid()
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('y')
+    ax2.legend(('Original data', 'Regression curve', 'Predicted Data', 'Error'))
+    ax2.set_title('Test set')
+
+    # ---------------------------------------------------------------------#
+    # TODO: Compute the error for the trained model.
+    # ---------------------------------------------------------------------#
+    valX = validation_data[:, 0].reshape(-1, 1)
+    valY = validation_data[:, 1].reshape(-1, 1)
+    valX_square = np.append(valX, valX**2, axis=1)
+    valXones_square = util.addones(valX_square)
+    testXones_square = util.addones(testX_square)
+    E_validation = np.linalg.norm(valXones_square.dot(Theta) - valY) ** 2
+    E_test = np.linalg.norm(testXones_square.dot(Theta) - testY) ** 2
     return E_validation, E_test
+
 
 
 # SECTION 2: Logistic regression
