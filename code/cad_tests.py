@@ -82,8 +82,8 @@ def linear_regression():
     valY = validation_data[:,1].reshape(-1,1)
     valXones = util.addones(valX)
     testXones = util.addones(testX)
-    E_validation = np.linalg.norm(valXones.dot(Theta) - valY)**2
-    E_test = np.linalg.norm(testXones.dot(Theta) - testY)**2
+    E_validation = (np.linalg.norm(valXones.dot(Theta) - valY)**2)/validation_data.shape[0]
+    E_test = np.linalg.norm(testXones.dot(Theta) - testY)**2/test_data.shape[0]
     return E_validation, E_test
 
 
@@ -146,8 +146,8 @@ def quadratic_regression():
     valX_square = np.append(valX, valX**2, axis=1)
     valXones_square = util.addones(valX_square)
     testXones_square = util.addones(testX_square)
-    E_validation = np.linalg.norm(valXones_square.dot(Theta) - valY) ** 2
-    E_test = np.linalg.norm(testXones_square.dot(Theta) - testY) ** 2
+    E_validation = np.linalg.norm(valXones_square.dot(Theta) - valY) ** 2 / validation_data.shape[0]
+    E_test = np.linalg.norm(testXones_square.dot(Theta) - testY) ** 2 / test_data.shape[0]
     return E_validation, E_test
 
 
