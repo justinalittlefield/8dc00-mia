@@ -289,7 +289,7 @@ def model_training():
         # w, x, and y). Implement it as follows:
         # dL_dw = ...
         #---------------------------------------------------------------------#
-
+        dL_dw = 2*x*(w*x-y)
         # Take a step and update the weight
         w = w - r*dL_dw
 
@@ -352,6 +352,8 @@ class Training:
         # self.w1_shape = (.. , ..)
         # self.w2_shape = (.. , ..)
         #---------------------------------------------------------------------#
+        self.w1_shape = (in_features,n_hidden_features)
+        self.w2_shape = (n_hidden_features,out_features)
 
         return {'w1_shape': self.w1_shape,
                 'w2_shape': self.w2_shape}
@@ -458,6 +460,8 @@ class Training:
         # w1 = w1 - ...
         # w2 = w2 - ...
         #---------------------------------------------------------------------#
+        w1 = w1 - self.learning_rate*dL_dw1
+        w2 = w2 - self.learning_rate*dL_dw2
         return {'w1': w1,
                 'w2': w2}
 
